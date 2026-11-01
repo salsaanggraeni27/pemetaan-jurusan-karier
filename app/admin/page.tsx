@@ -2,16 +2,16 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { 
-  Users, 
-  GraduationCap, 
-  Sliders, 
-  Briefcase, 
-  BookOpen, 
-  CheckCircle2, 
-  Clock, 
-  TrendingUp, 
-  ArrowRight, 
+import {
+  Users,
+  GraduationCap,
+  Sliders,
+  Briefcase,
+  BookOpen,
+  CheckCircle2,
+  Clock,
+  TrendingUp,
+  ArrowRight,
   Filter,
   BarChart3,
   Sparkles,
@@ -41,24 +41,24 @@ export default function AdminDashboardPage() {
     return <div className="max-w-6xl mx-auto px-4 py-16 text-center text-slate-500">Memuat dashboard bimbingan konseling...</div>;
   }
 
-  const completionRate = stats?.totalSiswa > 0 
-    ? Math.round((stats.siswaSelesai / stats.totalSiswa) * 100) 
+  const completionRate = stats?.totalSiswa > 0
+    ? Math.round((stats.siswaSelesai / stats.totalSiswa) * 100)
     : 0;
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-      
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-12 space-y-8">
+
       {/* Top Banner */}
-      <div className="bg-gradient-to-r from-slate-900 via-indigo-950 to-blue-950 rounded-3xl p-6 sm:p-8 text-white shadow-xl relative overflow-hidden">
-        <div className="space-y-3 relative z-10">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-500/30 text-indigo-200 text-xs font-bold border border-indigo-400/20">
+      <div className="bg-gradient-to-r from-slate-900 via-indigo-950 to-blue-950 rounded-3xl p-7 sm:p-10 text-white shadow-xl relative overflow-hidden">
+        <div className="space-y-3.5 relative z-10 max-w-3xl">
+          <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-indigo-500/30 text-indigo-200 text-xs font-bold border border-indigo-400/20 backdrop-blur">
             <Sparkles className="w-3.5 h-3.5 text-amber-300" />
             Panel Utama Guru Bimbingan &amp; Konseling (BK)
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight leading-tight">
             Dashboard Pemetaan &amp; Rekapitulasi Siswa
           </h1>
-          <p className="text-xs sm:text-sm text-slate-300 max-w-2xl leading-relaxed">
+          <p className="text-xs sm:text-sm text-slate-300 leading-relaxed font-normal">
             Kelola matriks pembobotan nilai per jurusan, pantau status pengisian rapor siswa SMAN 1 Bandung, dan evaluasi arah tren minat karir secara terpusat.
           </p>
         </div>
@@ -66,7 +66,7 @@ export default function AdminDashboardPage() {
 
       {/* KPI Cards Grid */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-        
+
         <div className="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm space-y-2">
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Siswa</span>
@@ -115,7 +115,7 @@ export default function AdminDashboardPage() {
 
       {/* Middle Section: Top Majors Analytics & Fast Actions */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        
+
         {/* Left 2 Cols: Distribution / Top Recommendations Chart */}
         <div className="lg:col-span-2 bg-white rounded-3xl p-6 sm:p-7 border border-slate-200 shadow-sm space-y-6">
           <div className="flex items-center justify-between pb-4 border-b border-slate-100">
@@ -150,7 +150,7 @@ export default function AdminDashboardPage() {
                     </div>
 
                     <div className="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
-                      <div 
+                      <div
                         className="bg-gradient-to-r from-blue-600 to-indigo-600 h-full rounded-full transition-all duration-500"
                         style={{ width: `${percentage}%` }}
                       ></div>
@@ -289,11 +289,10 @@ export default function AdminDashboardPage() {
                   <td className="py-3 px-3 text-slate-500 font-mono">{row.siswa.nisn_nip}</td>
                   <td className="py-3 px-3 text-slate-700">{row.siswa.kelas || '-'}</td>
                   <td className="py-3 px-3 text-center">
-                    <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
-                      row.status === 'Selesai Pemetaan' 
-                        ? 'bg-emerald-100 text-emerald-800' 
+                    <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold ${row.status === 'Selesai Pemetaan'
+                        ? 'bg-emerald-100 text-emerald-800'
                         : 'bg-amber-100 text-amber-800'
-                    }`}>
+                      }`}>
                       {row.status}
                     </span>
                   </td>
