@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { 
   Users, 
   Search, 
@@ -11,7 +12,8 @@ import {
   GraduationCap, 
   Printer, 
   ArrowRight,
-  Sparkles
+  Sparkles,
+  FileEdit
 } from 'lucide-react';
 
 export default function MonitoringSiswaPage() {
@@ -192,13 +194,21 @@ export default function MonitoringSiswaPage() {
                       )}
                     </td>
                     <td className="py-3 px-4 text-right no-print">
-                      <button
-                        type="button"
-                        onClick={() => handleOpenDetail(row)}
-                        className="px-3 py-1.5 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold text-xs inline-flex items-center gap-1 transition"
-                      >
-                        <Eye className="w-3.5 h-3.5" /> Detail
-                      </button>
+                      <div className="flex items-center justify-end gap-1.5">
+                        <Link
+                          href={`/admin/input-nilai?siswaId=${row.siswa.id}`}
+                          className="px-2.5 py-1.5 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs inline-flex items-center gap-1 transition"
+                        >
+                          <FileEdit className="w-3.5 h-3.5" /> Input Nilai
+                        </Link>
+                        <button
+                          type="button"
+                          onClick={() => handleOpenDetail(row)}
+                          className="px-2.5 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs inline-flex items-center gap-1 transition"
+                        >
+                          <Eye className="w-3.5 h-3.5" /> Detail
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 );
@@ -280,3 +290,4 @@ export default function MonitoringSiswaPage() {
     </div>
   );
 }
+

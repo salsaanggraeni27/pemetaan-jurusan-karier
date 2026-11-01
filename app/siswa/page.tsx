@@ -5,8 +5,6 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { 
   GraduationCap, 
-  Compass, 
-  FileEdit, 
   Award, 
   Briefcase, 
   Printer, 
@@ -15,7 +13,9 @@ import {
   Clock, 
   TrendingUp, 
   Sparkles, 
-  BookOpen
+  BookOpen,
+  Lock,
+  FileCheck
 } from 'lucide-react';
 
 export default function SiswaDashboardPage() {
@@ -31,6 +31,10 @@ export default function SiswaDashboardPage() {
       return;
     }
     const parsed = JSON.parse(saved);
+    if (parsed.role === 'GURU_BK') {
+      router.push('/admin');
+      return;
+    }
     setUser(parsed);
 
     // Fetch recommendation status
@@ -65,12 +69,12 @@ export default function SiswaDashboardPage() {
         <div className="relative z-10 space-y-4 max-w-2xl">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-xs font-medium backdrop-blur">
             <Sparkles className="w-3.5 h-3.5 text-amber-300" />
-            Portal Bimbingan Konseling Siswa SMAN 1 Bandung
+            Portal Siswa • Layanan Bimbingan &amp; Konseling SMAN 1 Bandung
           </div>
 
           <div>
             <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
-              Halo, {user?.nama || 'Siswa'}! 👋
+              Selamat Datang, {user?.nama || 'Siswa'}! 👋
             </h1>
             <p className="text-sm text-blue-100 mt-1">
               NISN: <span className="font-semibold text-white">{user?.nisn_nip}</span> • Kelas: <span className="font-semibold text-white">{user?.kelas || 'XII'}</span>
@@ -78,26 +82,33 @@ export default function SiswaDashboardPage() {
           </div>
 
           <p className="text-xs sm:text-sm text-blue-100/90 leading-relaxed">
-            Sistem pemetaan ini membantu Anda menganalisis kekuatan akademik berdasarkan nilai rapor semester untuk menentukan jurusan kuliah terbaik dan karir yang tepat.
+            Sistem pemetaan ini mengevaluasi nilai rapor resmi Anda yang telah diverifikasi oleh Guru BK untuk merekomendasikan program studi perkuliahan serta prospek karir terbaik.
           </p>
 
           <div className="pt-2 flex flex-wrap gap-3">
-            <Link
-              href="/siswa/input-nilai"
-              className="px-5 py-2.5 rounded-xl bg-white text-blue-800 font-bold text-xs sm:text-sm shadow-md hover:bg-blue-50 transition flex items-center gap-2"
-            >
-              <FileEdit className="w-4 h-4 text-blue-600" />
-              {recommendationData ? 'Perbarui Nilai Rapor' : 'Mulai Input Nilai Rapor'}
-            </Link>
+            {recommendationData ? (
+              <>
+                <Link
+                  href="/siswa/rekomendasi"
+                  className="px-5 py-2.5 rounded-xl bg-white text-blue-800 font-bold text-xs sm:text-sm shadow-md hover:bg-blue-50 transition flex items-center gap-2"
+                >
+                  <Award className="w-4 h-4 text-blue-600" />
+                  Lihat Hasil Rekomendasi Jurusan
+                </Link>
 
-            {recommendationData && (
-              <Link
-                href="/siswa/rekomendasi"
-                className="px-5 py-2.5 rounded-xl bg-blue-500/30 hover:bg-blue-500/40 border border-white/20 text-white font-bold text-xs sm:text-sm backdrop-blur transition flex items-center gap-2"
-              >
-                <Award className="w-4 h-4 text-amber-300" />
-                Lihat Rekomendasi Lengkap
-              </Link>
+                <Link
+                  href="/siswa/eksplorasi-karir"
+                  className="px-5 py-2.5 rounded-xl bg-blue-500/30 hover:bg-blue-500/40 border border-white/20 text-white font-bold text-xs sm:text-sm backdrop-blur transition flex items-center gap-2"
+                >
+                  <Briefcase className="w-4 h-4 text-amber-300" />
+                  Eksplorasi Prospek Karir
+                </Link>
+              </>
+            ) : (
+              <div className="p-3 rounded-xl bg-white/10 border border-white/20 text-xs text-blue-100 flex items-center gap-2">
+                <Clock className="w-4 h-4 text-amber-300 shrink-0" />
+                <span>Nilai rapor Anda sedang dalam proses input &amp; verifikasi oleh Guru BK.</span>
+              </div>
             )}
           </div>
         </div>
@@ -113,7 +124,7 @@ export default function SiswaDashboardPage() {
             <div className="bg-white rounded-3xl p-6 sm:p-7 border border-slate-200 shadow-sm space-y-6">
               <div className="flex items-center justify-between pb-4 border-b border-slate-100">
                 <div>
-                  <span className="text-[11px] font-bold uppercase tracking-wider text-blue-600">Hasil Pemetaan Tertinggi Anda</span>
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-blue-600">Hasil Pemetaan Akademik Anda</span>
                   <h3 className="text-lg font-extrabold text-slate-900 mt-0.5">Rekomendasi Utama (Peringkat #1)</h3>
                 </div>
                 <span className="px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 flex items-center gap-1.5">
@@ -146,7 +157,12 @@ export default function SiswaDashboardPage() {
 
                 {/* Subject Contributors */}
                 <div className="pt-2 border-t border-blue-100/70">
-                  <span className="text-[11px] font-bold text-slate-700 block mb-2">Mata Pelajaran Pendukung Tertinggi:</span>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-[11px] font-bold text-slate-700">Mata Pelajaran Pendukung Tertinggi:</span>
+                    <span className="text-[10px] text-emerald-700 font-semibold flex items-center gap-1">
+                      <FileCheck className="w-3 h-3" /> Terverifikasi Guru BK
+                    </span>
+                  </div>
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                     {topMajor?.breakdown.slice(0, 3).map((item: any) => (
                       <div key={item.mapelId} className="bg-white p-2.5 rounded-xl border border-blue-100 text-xs">
@@ -210,44 +226,26 @@ export default function SiswaDashboardPage() {
           ) : (
             <div className="bg-white rounded-3xl p-8 border border-slate-200 text-center space-y-4">
               <div className="w-16 h-16 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center mx-auto">
-                <Compass className="w-8 h-8" />
+                <Lock className="w-8 h-8" />
               </div>
-              <h3 className="text-lg font-bold text-slate-900">Belum Ada Rekapitulasi Rapor</h3>
-              <p className="text-xs text-slate-500 max-w-md mx-auto">
-                Anda belum menginputkan nilai mata pelajaran rapor. Masukkan nilai Anda untuk mengaktifkan mesin pencocokan aturan pemetaan jurusan.
+              <h3 className="text-lg font-bold text-slate-900">Nilai Rapor Belum Diinput oleh Guru BK</h3>
+              <p className="text-xs text-slate-500 max-w-md mx-auto leading-relaxed">
+                Penginputan nilai rapor semester merupakan kewenangan resmi pihak Guru BK SMAN 1 Bandung. Silakan hubungi Guru BK Anda untuk verifikasi nilai rapor dan penjadwalan konsultasi studi lanjut.
               </p>
-              <Link
-                href="/siswa/input-nilai"
-                className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-md transition"
-              >
-                <FileEdit className="w-4 h-4" />
-                Input Nilai Rapor Sekarang
-              </Link>
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-100 text-slate-600 text-xs font-semibold">
+                <Clock className="w-4 h-4 text-amber-500" /> Menunggu input data nilai dari Guru BK
+              </div>
             </div>
           )}
 
         </div>
 
-        {/* Right Col: Quick Navigation & Academic Strengths */}
+        {/* Right Col: Navigation & Academic Strengths */}
         <div className="space-y-6">
           
           {/* Quick Action Navigation */}
           <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm space-y-3">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400">Navigasi Siswa</h4>
-            
-            <Link
-              href="/siswa/input-nilai"
-              className="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 text-slate-700 transition group"
-            >
-              <div className="w-9 h-9 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center group-hover:scale-105 transition">
-                <FileEdit className="w-4 h-4" />
-              </div>
-              <div className="flex-1">
-                <div className="text-xs font-bold text-slate-900">Form Nilai Rapor</div>
-                <div className="text-[10px] text-slate-500">Input & simulasi nilai mapel</div>
-              </div>
-              <ArrowRight className="w-4 h-4 text-slate-400 group-hover:translate-x-1 transition" />
-            </Link>
+            <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400">Navigasi Layanan Siswa</h4>
 
             <Link
               href="/siswa/rekomendasi"
@@ -258,7 +256,7 @@ export default function SiswaDashboardPage() {
               </div>
               <div className="flex-1">
                 <div className="text-xs font-bold text-slate-900">Peringkat Jurusan</div>
-                <div className="text-[10px] text-slate-500">Kalkulasi Rule-Based Matching</div>
+                <div className="text-[10px] text-slate-500">Hasil kalkulasi Rule-Based</div>
               </div>
               <ArrowRight className="w-4 h-4 text-slate-400 group-hover:translate-x-1 transition" />
             </Link>
@@ -272,7 +270,21 @@ export default function SiswaDashboardPage() {
               </div>
               <div className="flex-1">
                 <div className="text-xs font-bold text-slate-900">Katalog Prospek Karir</div>
-                <div className="text-[10px] text-slate-500">Pohon profesi & kualifikasi</div>
+                <div className="text-[10px] text-slate-500">Pohon profesi &amp; kualifikasi</div>
+              </div>
+              <ArrowRight className="w-4 h-4 text-slate-400 group-hover:translate-x-1 transition" />
+            </Link>
+
+            <Link
+              href="/siswa/input-nilai"
+              className="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 text-slate-700 transition group"
+            >
+              <div className="w-9 h-9 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center group-hover:scale-105 transition">
+                <FileCheck className="w-4 h-4" />
+              </div>
+              <div className="flex-1">
+                <div className="text-xs font-bold text-slate-900">Transkrip Nilai Rapor</div>
+                <div className="text-[10px] text-slate-500">Nilai resmi terverifikasi BK</div>
               </div>
               <ArrowRight className="w-4 h-4 text-slate-400 group-hover:translate-x-1 transition" />
             </Link>

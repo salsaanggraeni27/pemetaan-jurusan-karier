@@ -53,11 +53,11 @@ export default function HomePage() {
 
           <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link
-              href="/siswa/input-nilai"
+              href="/login"
               className="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-semibold shadow-lg shadow-blue-500/30 flex items-center justify-center gap-2 transition hover:scale-[1.02]"
             >
               <Compass className="w-5 h-5" />
-              Mulai Pemetaan Nilai Rapor
+              Masuk ke Portal Siswa
               <ArrowRight className="w-4 h-4" />
             </Link>
 
@@ -295,10 +295,10 @@ export default function HomePage() {
 
               <div className="pt-2">
                 <Link
-                  href="/siswa/input-nilai"
+                  href="/login"
                   className="block text-center py-2.5 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs transition"
                 >
-                  Coba Sekarang dengan Nilai Anda Sendiri
+                  Masuk untuk Melihat Hasil Pemetaan Anda
                 </Link>
               </div>
 
@@ -311,3 +311,4 @@ export default function HomePage() {
     </div>
   );
 }
+

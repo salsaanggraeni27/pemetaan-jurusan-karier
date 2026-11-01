@@ -584,3 +584,4 @@ export const initialNilaiSiswa: NilaiSiswa[] = [
   { id_nilai: 41, id_siswa: 3, id_mapel: 13, nilai: 89 },
   { id_nilai: 42, id_siswa: 3, id_mapel: 14, nilai: 88 }
 ];
+

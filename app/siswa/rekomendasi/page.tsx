@@ -58,15 +58,15 @@ export default function RekomendasiPage() {
         <div className="w-16 h-16 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center mx-auto">
           <Compass className="w-8 h-8" />
         </div>
-        <h2 className="text-xl font-bold text-slate-900">Belum Ada Hasil Rekomendasi</h2>
-        <p className="text-xs text-slate-500">
-          Silakan inputkan nilai rapor semester Anda terlebih dahulu agar mesin Rule-Based Matching dapat mengalkulasi peringkat jurusan.
+        <h2 className="text-xl font-bold text-slate-900">Belum Ada Rekomendasi Jurusan</h2>
+        <p className="text-xs text-slate-500 leading-relaxed">
+          Nilai rapor semester Anda belum diinput atau diverifikasi oleh Guru Bimbingan dan Konseling (BK) SMAN 1 Bandung. Silakan hubungi Guru BK Anda untuk verifikasi nilai rapor dan proses pemetaan jurusan.
         </p>
         <Link
-          href="/siswa/input-nilai"
+          href="/siswa"
           className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-blue-600 text-white font-bold text-xs shadow transition hover:bg-blue-700"
         >
-          Input Nilai Rapor Sekarang
+          Kembali ke Beranda Siswa
         </Link>
       </div>
     );
@@ -107,7 +107,7 @@ export default function RekomendasiPage() {
             href="/siswa/input-nilai"
             className="px-4 py-2.5 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 font-semibold text-xs transition"
           >
-            Ubah Nilai
+            Transkrip Nilai Rapor
           </Link>
         </div>
       </div>
@@ -380,3 +380,4 @@ export default function RekomendasiPage() {
     </div>
   );
 }
+

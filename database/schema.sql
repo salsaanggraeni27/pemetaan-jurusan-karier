@@ -195,3 +195,4 @@ INSERT INTO `relasi_jurusan_karir` (`id_jurusan`, `id_karir`) VALUES
 (10, 13), (10, 9),
 (11, 14),
 (12, 15);
+

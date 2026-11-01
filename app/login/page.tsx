@@ -54,11 +54,32 @@ export default function LoginPage() {
     }
   };
 
-  const setQuickUser = (nisn: string, pass: string, role: 'SISWA' | 'GURU_BK') => {
+  const setQuickUser = async (nisn: string, pass: string, role: 'SISWA' | 'GURU_BK') => {
     setActiveTab(role);
     setNisnNip(nisn);
     setPassword(pass);
     setErrorMessage('');
+    setLoading(true);
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nisn_nip: nisn, password: pass })
+      });
+      const data = await res.json();
+      if (data.success && data.user) {
+        localStorage.setItem('sman1_user', JSON.stringify(data.user));
+        if (data.user.role === 'GURU_BK') {
+          router.push('/admin');
+        } else {
+          router.push('/siswa');
+        }
+      }
+    } catch (err) {
+      // fallback
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -211,3 +232,4 @@ export default function LoginPage() {
     </div>
   );
 }
+
