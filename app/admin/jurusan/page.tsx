@@ -15,10 +15,13 @@ import {
 
 export default function MasterJurusanPage() {
   const [jurusanList, setJurusanList] = useState<any[]>([]);
+  const [karirList, setKarirList] = useState<any[]>([]);
+  const [relasiList, setRelasiList] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
   const [editingJurusan, setEditingJurusan] = useState<any>(null);
+  const [selectedKarirIds, setSelectedKarirIds] = useState<number[]>([]);
   const [notification, setNotification] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
   // Form State
@@ -33,10 +36,18 @@ export default function MasterJurusanPage() {
   });
 
   const fetchJurusan = () => {
-    fetch('/api/jurusan')
-      .then(res => res.json())
-      .then(res => {
-        if (res.success) setJurusanList(res.data);
+    Promise.all([
+      fetch('/api/jurusan').then(res => res.json()),
+      fetch('/api/karir').then(res => res.json())
+    ])
+      .then(([jurRes, karirRes]) => {
+        if (jurRes.success) {
+          setJurusanList(jurRes.data || []);
+          setRelasiList(jurRes.relasi || []);
+        }
+        if (karirRes.success) {
+          setKarirList(karirRes.data || []);
+        }
         setLoading(false);
       })
       .catch(err => {
@@ -49,8 +60,15 @@ export default function MasterJurusanPage() {
     fetchJurusan();
   }, []);
 
+  const toggleKarirSelection = (karirId: number) => {
+    setSelectedKarirIds(prev =>
+      prev.includes(karirId) ? prev.filter(id => id !== karirId) : [...prev, karirId]
+    );
+  };
+
   const handleOpenAdd = () => {
     setEditingJurusan(null);
+    setSelectedKarirIds([]);
     setFormData({
       nama_jurusan: '',
       rumpun: 'Saintek',
@@ -65,6 +83,10 @@ export default function MasterJurusanPage() {
 
   const handleOpenEdit = (item: any) => {
     setEditingJurusan(item);
+    const linkedIds = relasiList
+      .filter(r => r.id_jurusan === item.id_jurusan)
+      .map(r => r.id_karir);
+    setSelectedKarirIds(linkedIds);
     setFormData({
       nama_jurusan: item.nama_jurusan,
       rumpun: item.rumpun,
@@ -85,7 +107,8 @@ export default function MasterJurusanPage() {
 
     const payload: any = {
       ...formData,
-      universitas_favorit: formData.universitas_favorit.split(',').map(s => s.trim())
+      universitas_favorit: formData.universitas_favorit.split(',').map(s => s.trim()),
+      karirIds: selectedKarirIds
     };
 
     if (editingJurusan) {
@@ -229,8 +252,18 @@ export default function MasterJurusanPage() {
               </div>
             </div>
 
-            <div className="pt-2 border-t border-slate-100 text-[11px] text-slate-500 truncate">
-              <strong>Kampus:</strong> {Array.isArray(j.universitas_favorit) ? j.universitas_favorit.join(', ') : j.universitas_favorit}
+            <div className="pt-2 border-t border-slate-100 space-y-1 text-[11px] text-slate-500">
+              <div className="truncate">
+                <strong>Kampus:</strong> {Array.isArray(j.universitas_favorit) ? j.universitas_favorit.join(', ') : j.universitas_favorit}
+              </div>
+              <div className="truncate">
+                <strong>Prospek Karir ({relasiList.filter(r => r.id_jurusan === j.id_jurusan).length}):</strong>{' '}
+                {relasiList
+                  .filter(r => r.id_jurusan === j.id_jurusan)
+                  .map(r => karirList.find(k => k.id_karir === r.id_karir)?.profesi)
+                  .filter(Boolean)
+                  .join(', ') || 'Belum dipetakan'}
+              </div>
             </div>
           </div>
         ))}
@@ -341,6 +374,32 @@ export default function MasterJurusanPage() {
                   placeholder="Uraian ringkas kurikulum dan fokus pembelajaran..."
                   className="w-full p-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-900"
                 />
+              </div>
+
+              <div>
+                <label className="block font-bold text-slate-700 mb-1">
+                  Pemetaan Prospek Karir Terkait ({selectedKarirIds.length} dipilih)
+                </label>
+                <div className="max-h-40 overflow-y-auto border border-slate-200 rounded-xl p-2.5 space-y-1.5 bg-slate-50">
+                  {karirList.map(k => (
+                    <label
+                      key={k.id_karir}
+                      className="flex items-center gap-2 p-1.5 rounded-lg hover:bg-white cursor-pointer text-slate-700"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={selectedKarirIds.includes(k.id_karir)}
+                        onChange={() => toggleKarirSelection(k.id_karir)}
+                        className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+                      />
+                      <span className="font-medium">{k.profesi}</span>
+                      <span className="text-[10px] text-slate-400 ml-auto">{k.industri}</span>
+                    </label>
+                  ))}
+                  {karirList.length === 0 && (
+                    <p className="text-slate-400 italic p-1">Belum ada data karir.</p>
+                  )}
+                </div>
               </div>
 
               <div className="pt-2 flex justify-end gap-2">

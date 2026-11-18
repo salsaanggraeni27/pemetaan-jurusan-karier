@@ -11,7 +11,7 @@ export async function GET(request: Request) {
       return NextResponse.json({ success: false, message: 'siswaId dibutuhkan' }, { status: 400 });
     }
 
-    const calculation = db.getHasilRekomendasiSiswa(parseInt(siswaId));
+    const calculation = await db.getHasilRekomendasiSiswa(parseInt(siswaId));
     if (!calculation) {
       return NextResponse.json({
         success: false,
@@ -19,9 +19,11 @@ export async function GET(request: Request) {
       });
     }
 
-    const allJurusan = db.getJurusan();
-    const allKarir = db.getKarir();
-    const allRelasi = db.getRelasiJurusanKarir();
+    const [allJurusan, allKarir, allRelasi] = await Promise.all([
+      db.getJurusan(),
+      db.getKarir(),
+      db.getRelasiJurusanKarir()
+    ]);
 
     const resultsWithCareers = calculation.results.map(r => {
       const linkedCareer = getLinkedCareersForJurusan(r.jurusan.id_jurusan, allJurusan, allKarir, allRelasi);

@@ -10,7 +10,7 @@ export async function GET(request: Request) {
       return NextResponse.json({ success: false, message: 'User ID dibutuhkan' }, { status: 400 });
     }
 
-    const user = db.getUserById(parseInt(id));
+    const user = await db.getUserById(parseInt(id));
     if (!user) {
       return NextResponse.json({ success: false, message: 'User tidak ditemukan' }, { status: 404 });
     }

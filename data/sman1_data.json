@@ -1112,90 +1112,6 @@
       "nilai": 88
     },
     {
-      "id_nilai": 43,
-      "id_siswa": 4,
-      "id_mapel": 1,
-      "nilai": 88
-    },
-    {
-      "id_nilai": 44,
-      "id_siswa": 4,
-      "id_mapel": 2,
-      "nilai": 100
-    },
-    {
-      "id_nilai": 45,
-      "id_siswa": 4,
-      "id_mapel": 3,
-      "nilai": 91
-    },
-    {
-      "id_nilai": 46,
-      "id_siswa": 4,
-      "id_mapel": 4,
-      "nilai": 89
-    },
-    {
-      "id_nilai": 47,
-      "id_siswa": 4,
-      "id_mapel": 5,
-      "nilai": 89
-    },
-    {
-      "id_nilai": 48,
-      "id_siswa": 4,
-      "id_mapel": 6,
-      "nilai": 90
-    },
-    {
-      "id_nilai": 49,
-      "id_siswa": 4,
-      "id_mapel": 7,
-      "nilai": 89
-    },
-    {
-      "id_nilai": 50,
-      "id_siswa": 4,
-      "id_mapel": 8,
-      "nilai": 90
-    },
-    {
-      "id_nilai": 51,
-      "id_siswa": 4,
-      "id_mapel": 9,
-      "nilai": 70
-    },
-    {
-      "id_nilai": 52,
-      "id_siswa": 4,
-      "id_mapel": 10,
-      "nilai": 86
-    },
-    {
-      "id_nilai": 53,
-      "id_siswa": 4,
-      "id_mapel": 11,
-      "nilai": 89
-    },
-    {
-      "id_nilai": 54,
-      "id_siswa": 4,
-      "id_mapel": 12,
-      "nilai": 90
-    },
-    {
-      "id_nilai": 55,
-      "id_siswa": 4,
-      "id_mapel": 13,
-      "nilai": 73
-    },
-    {
-      "id_nilai": 56,
-      "id_siswa": 4,
-      "id_mapel": 14,
-      "nilai": 100
-    },
-    {
       "id_nilai": 57,
       "id_siswa": 2,
       "id_mapel": 1,
@@ -1278,6 +1194,90 @@
       "id_siswa": 2,
       "id_mapel": 14,
       "nilai": 87
+    },
+    {
+      "id_nilai": 71,
+      "id_siswa": 4,
+      "id_mapel": 1,
+      "nilai": 100
+    },
+    {
+      "id_nilai": 72,
+      "id_siswa": 4,
+      "id_mapel": 2,
+      "nilai": 100
+    },
+    {
+      "id_nilai": 73,
+      "id_siswa": 4,
+      "id_mapel": 3,
+      "nilai": 100
+    },
+    {
+      "id_nilai": 74,
+      "id_siswa": 4,
+      "id_mapel": 4,
+      "nilai": 50
+    },
+    {
+      "id_nilai": 75,
+      "id_siswa": 4,
+      "id_mapel": 5,
+      "nilai": 89
+    },
+    {
+      "id_nilai": 76,
+      "id_siswa": 4,
+      "id_mapel": 6,
+      "nilai": 90
+    },
+    {
+      "id_nilai": 77,
+      "id_siswa": 4,
+      "id_mapel": 7,
+      "nilai": 89
+    },
+    {
+      "id_nilai": 78,
+      "id_siswa": 4,
+      "id_mapel": 8,
+      "nilai": 90
+    },
+    {
+      "id_nilai": 79,
+      "id_siswa": 4,
+      "id_mapel": 9,
+      "nilai": 70
+    },
+    {
+      "id_nilai": 80,
+      "id_siswa": 4,
+      "id_mapel": 10,
+      "nilai": 86
+    },
+    {
+      "id_nilai": 81,
+      "id_siswa": 4,
+      "id_mapel": 11,
+      "nilai": 89
+    },
+    {
+      "id_nilai": 82,
+      "id_siswa": 4,
+      "id_mapel": 12,
+      "nilai": 90
+    },
+    {
+      "id_nilai": 83,
+      "id_siswa": 4,
+      "id_mapel": 13,
+      "nilai": 73
+    },
+    {
+      "id_nilai": 84,
+      "id_siswa": 4,
+      "id_mapel": 14,
+      "nilai": 100
     }
   ],
   "hasil_rekomendasi": [
@@ -1334,114 +1334,6 @@
       "persentase_kecocokan": 92.6,
       "ranking": 3,
       "tanggal_analisis": "2026-11-01T13:06:54.887Z"
-    },
-    {
-      "id": 10,
-      "id_siswa": 4,
-      "id_jurusan": 6,
-      "total_skor": 9360,
-      "persentase_kecocokan": 93.6,
-      "ranking": 1,
-      "tanggal_analisis": "2026-11-01T13:48:55.424Z"
-    },
-    {
-      "id": 11,
-      "id_siswa": 4,
-      "id_jurusan": 9,
-      "total_skor": 9200,
-      "persentase_kecocokan": 92,
-      "ranking": 2,
-      "tanggal_analisis": "2026-11-01T13:48:55.424Z"
-    },
-    {
-      "id": 12,
-      "id_siswa": 4,
-      "id_jurusan": 12,
-      "total_skor": 9155,
-      "persentase_kecocokan": 91.55,
-      "ranking": 3,
-      "tanggal_analisis": "2026-11-01T13:48:55.424Z"
-    },
-    {
-      "id": 13,
-      "id_siswa": 4,
-      "id_jurusan": 7,
-      "total_skor": 9065,
-      "persentase_kecocokan": 90.65,
-      "ranking": 4,
-      "tanggal_analisis": "2026-11-01T13:48:55.424Z"
-    },
-    {
-      "id": 14,
-      "id_siswa": 4,
-      "id_jurusan": 8,
-      "total_skor": 8960,
-      "persentase_kecocokan": 89.6,
-      "ranking": 5,
-      "tanggal_analisis": "2026-11-01T13:48:55.424Z"
-    },
-    {
-      "id": 15,
-      "id_siswa": 4,
-      "id_jurusan": 10,
-      "total_skor": 8945,
-      "persentase_kecocokan": 89.45,
-      "ranking": 6,
-      "tanggal_analisis": "2026-11-01T13:48:55.425Z"
-    },
-    {
-      "id": 16,
-      "id_siswa": 4,
-      "id_jurusan": 5,
-      "total_skor": 8935,
-      "persentase_kecocokan": 89.35,
-      "ranking": 7,
-      "tanggal_analisis": "2026-11-01T13:48:55.425Z"
-    },
-    {
-      "id": 17,
-      "id_siswa": 4,
-      "id_jurusan": 3,
-      "total_skor": 8895,
-      "persentase_kecocokan": 88.95,
-      "ranking": 8,
-      "tanggal_analisis": "2026-11-01T13:48:55.425Z"
-    },
-    {
-      "id": 18,
-      "id_siswa": 4,
-      "id_jurusan": 1,
-      "total_skor": 8860,
-      "persentase_kecocokan": 88.6,
-      "ranking": 9,
-      "tanggal_analisis": "2026-11-01T13:48:55.425Z"
-    },
-    {
-      "id": 19,
-      "id_siswa": 4,
-      "id_jurusan": 4,
-      "total_skor": 8385,
-      "persentase_kecocokan": 83.85,
-      "ranking": 10,
-      "tanggal_analisis": "2026-11-01T13:48:55.425Z"
-    },
-    {
-      "id": 20,
-      "id_siswa": 4,
-      "id_jurusan": 11,
-      "total_skor": 8380,
-      "persentase_kecocokan": 83.8,
-      "ranking": 11,
-      "tanggal_analisis": "2026-11-01T13:48:55.425Z"
-    },
-    {
-      "id": 21,
-      "id_siswa": 4,
-      "id_jurusan": 2,
-      "total_skor": 8285,
-      "persentase_kecocokan": 82.85,
-      "ranking": 12,
-      "tanggal_analisis": "2026-11-01T13:48:55.425Z"
     },
     {
       "id": 22,
@@ -1550,6 +1442,114 @@
       "persentase_kecocokan": 77.75,
       "ranking": 12,
       "tanggal_analisis": "2026-11-01T14:06:07.222Z"
+    },
+    {
+      "id": 34,
+      "id_siswa": 4,
+      "id_jurusan": 6,
+      "total_skor": 9585,
+      "persentase_kecocokan": 95.85,
+      "ranking": 1,
+      "tanggal_analisis": "2026-11-02T01:24:05.823Z"
+    },
+    {
+      "id": 35,
+      "id_siswa": 4,
+      "id_jurusan": 7,
+      "total_skor": 9560,
+      "persentase_kecocokan": 95.6,
+      "ranking": 2,
+      "tanggal_analisis": "2026-11-02T01:24:05.823Z"
+    },
+    {
+      "id": 36,
+      "id_siswa": 4,
+      "id_jurusan": 12,
+      "total_skor": 9380,
+      "persentase_kecocokan": 93.8,
+      "ranking": 3,
+      "tanggal_analisis": "2026-11-02T01:24:05.823Z"
+    },
+    {
+      "id": 37,
+      "id_siswa": 4,
+      "id_jurusan": 8,
+      "total_skor": 9365,
+      "persentase_kecocokan": 93.65,
+      "ranking": 4,
+      "tanggal_analisis": "2026-11-02T01:24:05.823Z"
+    },
+    {
+      "id": 38,
+      "id_siswa": 4,
+      "id_jurusan": 5,
+      "total_skor": 9310,
+      "persentase_kecocokan": 93.1,
+      "ranking": 5,
+      "tanggal_analisis": "2026-11-02T01:24:05.823Z"
+    },
+    {
+      "id": 39,
+      "id_siswa": 4,
+      "id_jurusan": 10,
+      "total_skor": 9260,
+      "persentase_kecocokan": 92.6,
+      "ranking": 6,
+      "tanggal_analisis": "2026-11-02T01:24:05.823Z"
+    },
+    {
+      "id": 40,
+      "id_siswa": 4,
+      "id_jurusan": 1,
+      "total_skor": 9115,
+      "persentase_kecocokan": 91.15,
+      "ranking": 7,
+      "tanggal_analisis": "2026-11-02T01:24:05.823Z"
+    },
+    {
+      "id": 41,
+      "id_siswa": 4,
+      "id_jurusan": 3,
+      "total_skor": 9105,
+      "persentase_kecocokan": 91.05,
+      "ranking": 8,
+      "tanggal_analisis": "2026-11-02T01:24:05.823Z"
+    },
+    {
+      "id": 42,
+      "id_siswa": 4,
+      "id_jurusan": 11,
+      "total_skor": 8800,
+      "persentase_kecocokan": 88,
+      "ranking": 9,
+      "tanggal_analisis": "2026-11-02T01:24:05.823Z"
+    },
+    {
+      "id": 43,
+      "id_siswa": 4,
+      "id_jurusan": 4,
+      "total_skor": 8700,
+      "persentase_kecocokan": 87,
+      "ranking": 10,
+      "tanggal_analisis": "2026-11-02T01:24:05.823Z"
+    },
+    {
+      "id": 44,
+      "id_siswa": 4,
+      "id_jurusan": 2,
+      "total_skor": 8540,
+      "persentase_kecocokan": 85.4,
+      "ranking": 11,
+      "tanggal_analisis": "2026-11-02T01:24:05.823Z"
+    },
+    {
+      "id": 45,
+      "id_siswa": 4,
+      "id_jurusan": 9,
+      "total_skor": 7835,
+      "persentase_kecocokan": 78.35,
+      "ranking": 12,
+      "tanggal_analisis": "2026-11-02T01:24:05.823Z"
     }
   ]
 }

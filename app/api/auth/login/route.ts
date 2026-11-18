@@ -9,7 +9,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, message: 'NISN / NIP harus diisi' }, { status: 400 });
     }
 
-    const user = db.getUserByNisnNip(nisn_nip);
+    const user = await db.getUserByNisnNip(nisn_nip);
     if (!user) {
       return NextResponse.json({ success: false, message: 'Akun dengan NISN/NIP tersebut tidak ditemukan' }, { status: 404 });
     }
