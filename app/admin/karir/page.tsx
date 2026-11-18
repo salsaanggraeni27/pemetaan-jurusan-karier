@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { Karir, Jurusan, JurusanKarir } from '@/types';
 import { 
   Briefcase, 
   Plus, 
@@ -14,13 +15,13 @@ import {
 } from 'lucide-react';
 
 export default function MasterKarirPage() {
-  const [karirList, setKarirList] = useState<any[]>([]);
-  const [jurusanList, setJurusanList] = useState<any[]>([]);
-  const [relasiList, setRelasiList] = useState<any[]>([]);
+  const [karirList, setKarirList] = useState<Karir[]>([]);
+  const [jurusanList, setJurusanList] = useState<Jurusan[]>([]);
+  const [relasiList, setRelasiList] = useState<JurusanKarir[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
-  const [editingKarir, setEditingKarir] = useState<any>(null);
+  const [editingKarir, setEditingKarir] = useState<Karir | null>(null);
   const [selectedJurusanIds, setSelectedJurusanIds] = useState<number[]>([]);
   const [notification, setNotification] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
@@ -78,10 +79,10 @@ export default function MasterKarirPage() {
     setModalOpen(true);
   };
 
-  const handleOpenEdit = (item: any) => {
+  const handleOpenEdit = (item: Karir) => {
     setEditingKarir(item);
     const linkedIds = relasiList
-      .filter(r => r.id_karir === item.id_karir)
+      .filter(r => r.id_karir === item.id)
       .map(r => r.id_jurusan);
     setSelectedJurusanIds(linkedIds);
     setFormData({
@@ -108,7 +109,7 @@ export default function MasterKarirPage() {
     };
 
     if (editingKarir) {
-      payload.id_karir = editingKarir.id_karir;
+      payload.id = editingKarir.id;
     }
 
     try {
@@ -205,7 +206,7 @@ export default function MasterKarirPage() {
       {/* Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {filteredKarir.map(k => (
-          <div key={k.id_karir} className="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm space-y-3 flex flex-col justify-between">
+          <div key={k.id} className="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm space-y-3 flex flex-col justify-between">
             <div className="space-y-2">
               <div className="flex items-start justify-between gap-2">
                 <div>
@@ -225,7 +226,7 @@ export default function MasterKarirPage() {
                     <Edit className="w-4 h-4" />
                   </button>
                   <button
-                    onClick={() => handleDelete(k.id_karir)}
+                    onClick={() => handleDelete(k.id)}
                     className="p-1.5 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 transition"
                   >
                     <Trash2 className="w-4 h-4" />
@@ -247,8 +248,8 @@ export default function MasterKarirPage() {
               <span className="text-slate-500 shrink-0">Prospek: <strong>{k.prospek_masa_depan}</strong></span>
               <span className="text-sky-700 font-bold truncate">
                 {relasiList
-                  .filter(r => r.id_karir === k.id_karir)
-                  .map(r => jurusanList.find(j => j.id_jurusan === r.id_jurusan)?.nama_jurusan)
+                  .filter(r => r.id_karir === k.id)
+                  .map(r => jurusanList.find(j => j.id === r.id_jurusan)?.nama_jurusan)
                   .filter(Boolean)
                   .join(', ') || 'Belum terhubung ke Jurusan'}
               </span>
@@ -357,13 +358,13 @@ export default function MasterKarirPage() {
                 <div className="max-h-40 overflow-y-auto border border-slate-200 rounded-xl p-2.5 space-y-1.5 bg-slate-50">
                   {jurusanList.map(j => (
                     <label
-                      key={j.id_jurusan}
+                      key={j.id}
                       className="flex items-center gap-2 p-1.5 rounded-lg hover:bg-white cursor-pointer text-slate-700"
                     >
                       <input
                         type="checkbox"
-                        checked={selectedJurusanIds.includes(j.id_jurusan)}
-                        onChange={() => toggleJurusanSelection(j.id_jurusan)}
+                        checked={selectedJurusanIds.includes(j.id)}
+                        onChange={() => toggleJurusanSelection(j.id)}
                         className="rounded border-slate-300 text-sky-600 focus:ring-sky-500"
                       />
                       <span className="font-medium">{j.nama_jurusan}</span>

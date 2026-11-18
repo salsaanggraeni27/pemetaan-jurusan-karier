@@ -25,7 +25,7 @@ export async function POST(request: Request) {
     const { karirIds, ...jurusanPayload } = body;
     const saved = await db.saveJurusan(jurusanPayload);
     if (Array.isArray(karirIds)) {
-      await db.setRelasiForJurusan(saved.id_jurusan, karirIds);
+      await db.setRelasiForJurusan(saved.id, karirIds);
     }
     return NextResponse.json({ success: true, data: saved, message: 'Data jurusan berhasil disimpan' });
   } catch (error: any) {

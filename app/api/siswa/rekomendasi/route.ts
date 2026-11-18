@@ -26,7 +26,7 @@ export async function GET(request: Request) {
     ]);
 
     const resultsWithCareers = calculation.results.map(r => {
-      const linkedCareer = getLinkedCareersForJurusan(r.jurusan.id_jurusan, allJurusan, allKarir, allRelasi);
+      const linkedCareer = getLinkedCareersForJurusan(r.jurusan.id, allJurusan, allKarir, allRelasi);
       return {
         ...r,
         linkedCareer

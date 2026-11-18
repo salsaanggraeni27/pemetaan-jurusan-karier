@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { Jurusan, Karir, JurusanKarir } from '@/types';
 import { 
   GraduationCap, 
   Plus, 
@@ -14,13 +15,13 @@ import {
 } from 'lucide-react';
 
 export default function MasterJurusanPage() {
-  const [jurusanList, setJurusanList] = useState<any[]>([]);
-  const [karirList, setKarirList] = useState<any[]>([]);
-  const [relasiList, setRelasiList] = useState<any[]>([]);
+  const [jurusanList, setJurusanList] = useState<Jurusan[]>([]);
+  const [karirList, setKarirList] = useState<Karir[]>([]);
+  const [relasiList, setRelasiList] = useState<JurusanKarir[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
-  const [editingJurusan, setEditingJurusan] = useState<any>(null);
+  const [editingJurusan, setEditingJurusan] = useState<Jurusan | null>(null);
   const [selectedKarirIds, setSelectedKarirIds] = useState<number[]>([]);
   const [notification, setNotification] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
@@ -81,10 +82,10 @@ export default function MasterJurusanPage() {
     setModalOpen(true);
   };
 
-  const handleOpenEdit = (item: any) => {
+  const handleOpenEdit = (item: Jurusan) => {
     setEditingJurusan(item);
     const linkedIds = relasiList
-      .filter(r => r.id_jurusan === item.id_jurusan)
+      .filter(r => r.id_jurusan === item.id)
       .map(r => r.id_karir);
     setSelectedKarirIds(linkedIds);
     setFormData({
@@ -112,7 +113,7 @@ export default function MasterJurusanPage() {
     };
 
     if (editingJurusan) {
-      payload.id_jurusan = editingJurusan.id_jurusan;
+      payload.id = editingJurusan.id;
     }
 
     try {
@@ -210,7 +211,7 @@ export default function MasterJurusanPage() {
       {/* Grid Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {filteredJurusan.map(j => (
-          <div key={j.id_jurusan} className="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm space-y-3 flex flex-col justify-between">
+          <div key={j.id} className="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm space-y-3 flex flex-col justify-between">
             <div className="space-y-2">
               <div className="flex items-start justify-between gap-2">
                 <div>
@@ -233,7 +234,7 @@ export default function MasterJurusanPage() {
                     <Edit className="w-4 h-4" />
                   </button>
                   <button
-                    onClick={() => handleDelete(j.id_jurusan)}
+                    onClick={() => handleDelete(j.id)}
                     className="p-1.5 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 transition"
                   >
                     <Trash2 className="w-4 h-4" />
@@ -257,10 +258,10 @@ export default function MasterJurusanPage() {
                 <strong>Kampus:</strong> {Array.isArray(j.universitas_favorit) ? j.universitas_favorit.join(', ') : j.universitas_favorit}
               </div>
               <div className="truncate">
-                <strong>Prospek Karir ({relasiList.filter(r => r.id_jurusan === j.id_jurusan).length}):</strong>{' '}
+                <strong>Prospek Karir ({relasiList.filter(r => r.id_jurusan === j.id).length}):</strong>{' '}
                 {relasiList
-                  .filter(r => r.id_jurusan === j.id_jurusan)
-                  .map(r => karirList.find(k => k.id_karir === r.id_karir)?.profesi)
+                  .filter(r => r.id_jurusan === j.id)
+                  .map(r => karirList.find(k => k.id === r.id_karir)?.profesi)
                   .filter(Boolean)
                   .join(', ') || 'Belum dipetakan'}
               </div>
@@ -383,13 +384,13 @@ export default function MasterJurusanPage() {
                 <div className="max-h-40 overflow-y-auto border border-slate-200 rounded-xl p-2.5 space-y-1.5 bg-slate-50">
                   {karirList.map(k => (
                     <label
-                      key={k.id_karir}
+                      key={k.id}
                       className="flex items-center gap-2 p-1.5 rounded-lg hover:bg-white cursor-pointer text-slate-700"
                     >
                       <input
                         type="checkbox"
-                        checked={selectedKarirIds.includes(k.id_karir)}
-                        onChange={() => toggleKarirSelection(k.id_karir)}
+                        checked={selectedKarirIds.includes(k.id)}
+                        onChange={() => toggleKarirSelection(k.id)}
                         className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
                       />
                       <span className="font-medium">{k.profesi}</span>

@@ -7,7 +7,7 @@ import {
   User,
   NilaiSiswa,
   HasilRekomendasi
-} from './seed-data';
+} from '@/types';
 import { calculateJurusanRecommendations } from './rule-engine';
 import { ensureMySQLInitialized, RowDataPacket, ResultSetHeader } from './mysql';
 
@@ -46,8 +46,10 @@ function mapUserRow(row: RowDataPacket): User {
 }
 
 function mapMapelRow(row: RowDataPacket): MataPelajaran {
+  const id = Number(row.id);
   return {
-    id_mapel: Number(row.id),
+    id,
+    id_mapel: id,
     nama_mapel: String(row.nama_mapel),
     kategori: row.kategori as MataPelajaran['kategori'],
     deskripsi: row.deskripsi ?? undefined,
@@ -55,8 +57,10 @@ function mapMapelRow(row: RowDataPacket): MataPelajaran {
 }
 
 function mapJurusanRow(row: RowDataPacket): Jurusan {
+  const id = Number(row.id);
   return {
-    id_jurusan: Number(row.id),
+    id,
+    id_jurusan: id,
     nama_jurusan: String(row.nama_jurusan),
     rumpun: row.rumpun as Jurusan['rumpun'],
     fakultas: String(row.fakultas),
@@ -68,17 +72,23 @@ function mapJurusanRow(row: RowDataPacket): Jurusan {
 }
 
 function mapAturanBobotRow(row: RowDataPacket): AturanBobot {
+  const id = Number(row.id);
+  const idMapel = Number(row.id_mata_pelajaran);
   return {
-    id_rule: Number(row.id),
+    id,
+    id_rule: id,
     id_jurusan: Number(row.id_jurusan),
-    id_mapel: Number(row.id_mata_pelajaran),
+    id_mata_pelajaran: idMapel,
+    id_mapel: idMapel,
     bobot: Number(row.bobot),
   };
 }
 
 function mapKarirRow(row: RowDataPacket): Karir {
+  const id = Number(row.id);
   return {
-    id_karir: Number(row.id),
+    id,
+    id_karir: id,
     profesi: String(row.profesi),
     deskripsi: String(row.deskripsi),
     industri: String(row.industri),
@@ -97,18 +107,26 @@ function mapRelasiRow(row: RowDataPacket): RelasiJurusanKarir {
 }
 
 function mapNilaiRow(row: RowDataPacket): NilaiSiswa {
+  const id = Number(row.id);
+  const idUser = Number(row.id_user);
+  const idMapel = Number(row.id_mata_pelajaran);
   return {
-    id_nilai: Number(row.id),
-    id_siswa: Number(row.id_user),
-    id_mapel: Number(row.id_mata_pelajaran),
+    id,
+    id_nilai: id,
+    id_user: idUser,
+    id_siswa: idUser,
+    id_mata_pelajaran: idMapel,
+    id_mapel: idMapel,
     nilai: Number(row.nilai),
   };
 }
 
 function mapHasilRekomendasiRow(row: RowDataPacket): HasilRekomendasi {
+  const idUser = Number(row.id_user);
   return {
     id: Number(row.id),
-    id_siswa: Number(row.id_user),
+    id_user: idUser,
+    id_siswa: idUser,
     id_jurusan: Number(row.id_jurusan),
     total_skor: Number(row.total_skor),
     persentase_kecocokan: Number(row.persentase_kecocokan),
@@ -171,20 +189,21 @@ export const db = {
     return rows[0] ? mapMapelRow(rows[0]) : undefined;
   },
 
-  saveMapel: async (mapel: MataPelajaran): Promise<MataPelajaran> => {
+  saveMapel: async (mapel: Partial<MataPelajaran> & { nama_mapel: string; kategori: MataPelajaran['kategori'] }): Promise<MataPelajaran> => {
     const pool = await ensureMySQLInitialized();
-    if (mapel.id_mapel) {
+    const targetId = mapel.id ?? mapel.id_mapel;
+    if (targetId) {
       await pool.query(
         'UPDATE `mata_pelajaran` SET `nama_mapel` = ?, `kategori` = ?, `deskripsi` = ? WHERE `id` = ?',
-        [mapel.nama_mapel, mapel.kategori, mapel.deskripsi || null, mapel.id_mapel]
+        [mapel.nama_mapel, mapel.kategori, mapel.deskripsi || null, targetId]
       );
-      return mapel;
+      return { ...mapel, id: targetId, id_mapel: targetId };
     } else {
       const [result] = await pool.query<ResultSetHeader>(
         'INSERT INTO `mata_pelajaran` (`nama_mapel`, `kategori`, `deskripsi`) VALUES (?, ?, ?)',
         [mapel.nama_mapel, mapel.kategori, mapel.deskripsi || null]
       );
-      return { ...mapel, id_mapel: result.insertId };
+      return { ...mapel, id: result.insertId, id_mapel: result.insertId };
     }
   },
 
@@ -207,10 +226,12 @@ export const db = {
     return rows[0] ? mapJurusanRow(rows[0]) : undefined;
   },
 
-  saveJurusan: async (jurusan: Jurusan): Promise<Jurusan> => {
+  saveJurusan: async (jurusan: Partial<Jurusan> & { nama_jurusan: string; rumpun: Jurusan['rumpun'] }): Promise<Jurusan> => {
     const pool = await ensureMySQLInitialized();
-    const univJson = JSON.stringify(parseStringArray(jurusan.universitas_favorit));
-    if (jurusan.id_jurusan) {
+    const univArray = parseStringArray(jurusan.universitas_favorit);
+    const univJson = JSON.stringify(univArray);
+    const targetId = jurusan.id ?? jurusan.id_jurusan;
+    if (targetId) {
       await pool.query(
         'UPDATE `jurusan` SET `nama_jurusan` = ?, `rumpun` = ?, `fakultas` = ?, `deskripsi` = ?, `daya_tampung` = ?, `passing_grade_indikatif` = ?, `universitas_favorit` = ? WHERE `id` = ?',
         [
@@ -221,10 +242,19 @@ export const db = {
           Number(jurusan.daya_tampung) || 50,
           Number(jurusan.passing_grade_indikatif) || 80,
           univJson,
-          jurusan.id_jurusan,
+          targetId,
         ]
       );
-      return { ...jurusan, universitas_favorit: parseStringArray(jurusan.universitas_favorit) };
+      return {
+        ...jurusan,
+        id: targetId,
+        id_jurusan: targetId,
+        fakultas: jurusan.fakultas || '',
+        deskripsi: jurusan.deskripsi || '',
+        daya_tampung: Number(jurusan.daya_tampung) || 50,
+        passing_grade_indikatif: Number(jurusan.passing_grade_indikatif) || 80,
+        universitas_favorit: univArray,
+      };
     } else {
       const [result] = await pool.query<ResultSetHeader>(
         'INSERT INTO `jurusan` (`nama_jurusan`, `rumpun`, `fakultas`, `deskripsi`, `daya_tampung`, `passing_grade_indikatif`, `universitas_favorit`) VALUES (?, ?, ?, ?, ?, ?, ?)',
@@ -240,8 +270,13 @@ export const db = {
       );
       return {
         ...jurusan,
+        id: result.insertId,
         id_jurusan: result.insertId,
-        universitas_favorit: parseStringArray(jurusan.universitas_favorit),
+        fakultas: jurusan.fakultas || '',
+        deskripsi: jurusan.deskripsi || '',
+        daya_tampung: Number(jurusan.daya_tampung) || 50,
+        passing_grade_indikatif: Number(jurusan.passing_grade_indikatif) || 80,
+        universitas_favorit: univArray,
       };
     }
   },
@@ -270,7 +305,7 @@ export const db = {
 
   updateAturanBobotForJurusan: async (
     jurusanId: number,
-    rules: { id_mapel: number; bobot: number }[]
+    rules: { id_mata_pelajaran?: number; id_mapel?: number; bobot: number }[]
   ): Promise<AturanBobot[]> => {
     const pool = await ensureMySQLInitialized();
     const conn = await pool.getConnection();
@@ -278,10 +313,11 @@ export const db = {
       await conn.beginTransaction();
       await conn.query('DELETE FROM `aturan_bobot` WHERE `id_jurusan` = ?', [jurusanId]);
       for (const rule of rules) {
-        if (Number(rule.bobot) > 0) {
+        const mapelId = Number(rule.id_mata_pelajaran ?? rule.id_mapel);
+        if (mapelId && Number(rule.bobot) > 0) {
           await conn.query(
             'INSERT INTO `aturan_bobot` (`id_jurusan`, `id_mata_pelajaran`, `bobot`) VALUES (?, ?, ?)',
-            [jurusanId, rule.id_mapel, rule.bobot]
+            [jurusanId, mapelId, rule.bobot]
           );
         }
       }
@@ -308,10 +344,12 @@ export const db = {
     return rows[0] ? mapKarirRow(rows[0]) : undefined;
   },
 
-  saveKarir: async (karir: Karir): Promise<Karir> => {
+  saveKarir: async (karir: Partial<Karir> & { profesi: string; industri: string }): Promise<Karir> => {
     const pool = await ensureMySQLInitialized();
-    const kualifikasiJson = JSON.stringify(parseStringArray(karir.kualifikasi_utama));
-    if (karir.id_karir) {
+    const kualifikasiArray = parseStringArray(karir.kualifikasi_utama);
+    const kualifikasiJson = JSON.stringify(kualifikasiArray);
+    const targetId = karir.id ?? karir.id_karir;
+    if (targetId) {
       await pool.query(
         'UPDATE `karir` SET `profesi` = ?, `deskripsi` = ?, `industri` = ?, `estimasi_gaji` = ?, `kualifikasi_utama` = ?, `prospek_masa_depan` = ? WHERE `id` = ?',
         [
@@ -321,10 +359,18 @@ export const db = {
           karir.estimasi_gaji || '',
           kualifikasiJson,
           karir.prospek_masa_depan || 'Tinggi',
-          karir.id_karir,
+          targetId,
         ]
       );
-      return { ...karir, kualifikasi_utama: parseStringArray(karir.kualifikasi_utama) };
+      return {
+        ...karir,
+        id: targetId,
+        id_karir: targetId,
+        deskripsi: karir.deskripsi || '',
+        estimasi_gaji: karir.estimasi_gaji || '',
+        kualifikasi_utama: kualifikasiArray,
+        prospek_masa_depan: karir.prospek_masa_depan || 'Tinggi',
+      };
     } else {
       const [result] = await pool.query<ResultSetHeader>(
         'INSERT INTO `karir` (`profesi`, `deskripsi`, `industri`, `estimasi_gaji`, `kualifikasi_utama`, `prospek_masa_depan`) VALUES (?, ?, ?, ?, ?, ?)',
@@ -339,8 +385,12 @@ export const db = {
       );
       return {
         ...karir,
+        id: result.insertId,
         id_karir: result.insertId,
-        kualifikasi_utama: parseStringArray(karir.kualifikasi_utama),
+        deskripsi: karir.deskripsi || '',
+        estimasi_gaji: karir.estimasi_gaji || '',
+        kualifikasi_utama: kualifikasiArray,
+        prospek_masa_depan: karir.prospek_masa_depan || 'Tinggi',
       };
     }
   },
@@ -408,7 +458,7 @@ export const db = {
 
   saveNilaiSiswaAndCalculate: async (
     siswaId: number,
-    inputNilai: { id_mapel: number; nilai: number }[]
+    inputNilai: { id_mata_pelajaran?: number; id_mapel?: number; nilai: number }[]
   ) => {
     const pool = await ensureMySQLInitialized();
     const [allJurusan, allAturanBobot, allMapel] = await Promise.all([
@@ -417,10 +467,14 @@ export const db = {
       db.getMapel(),
     ]);
 
-    const normalizedInput = inputNilai.map(item => ({
-      id_mapel: Number(item.id_mapel),
-      nilai: Math.min(100, Math.max(0, Number(item.nilai) || 0)),
-    }));
+    const normalizedInput = inputNilai.map(item => {
+      const mapelId = Number(item.id_mata_pelajaran ?? item.id_mapel);
+      return {
+        id_mata_pelajaran: mapelId,
+        id_mapel: mapelId,
+        nilai: Math.min(100, Math.max(0, Number(item.nilai) || 0)),
+      };
+    });
 
     const calculation = calculateJurusanRecommendations(
       normalizedInput,
@@ -437,7 +491,7 @@ export const db = {
       for (const item of normalizedInput) {
         await conn.query(
           'INSERT INTO `nilai_siswa` (`id_user`, `id_mata_pelajaran`, `nilai`) VALUES (?, ?, ?)',
-          [siswaId, item.id_mapel, item.nilai]
+          [siswaId, item.id_mata_pelajaran, item.nilai]
         );
       }
 
@@ -445,7 +499,7 @@ export const db = {
       for (const res of calculation.results) {
         await conn.query(
           'INSERT INTO `hasil_rekomendasi` (`id_user`, `id_jurusan`, `total_skor`, `persentase_kecocokan`, `ranking`) VALUES (?, ?, ?, ?, ?)',
-          [siswaId, res.jurusan.id_jurusan, res.rawScore, res.normalizedScore, res.ranking]
+          [siswaId, res.jurusan.id, res.rawScore, res.normalizedScore, res.ranking]
         );
       }
 
@@ -473,7 +527,11 @@ export const db = {
     }
 
     return calculateJurusanRecommendations(
-      siswaNilai.map(n => ({ id_mapel: n.id_mapel, nilai: n.nilai })),
+      siswaNilai.map(n => ({
+        id_mata_pelajaran: n.id_mata_pelajaran,
+        id_mapel: n.id_mata_pelajaran,
+        nilai: n.nilai,
+      })),
       allJurusan,
       allAturanBobot,
       allMapel
@@ -494,14 +552,14 @@ export const db = {
     const siswaUsers = users.filter(u => u.role === 'SISWA');
 
     const siswaStatusList = siswaUsers.map(siswa => {
-      const nilai = nilaiRows.filter(n => n.id_siswa === siswa.id);
+      const nilai = nilaiRows.filter(n => n.id_user === siswa.id);
       const isCompleted = nilai.length >= 8;
       const recs = rekomRows
-        .filter(h => h.id_siswa === siswa.id)
+        .filter(h => h.id_user === siswa.id)
         .sort((a, b) => a.ranking - b.ranking);
 
       const topMajorId = recs[0]?.id_jurusan;
-      const topMajor = allJurusan.find(j => j.id_jurusan === topMajorId);
+      const topMajor = allJurusan.find(j => j.id === topMajorId);
 
       return {
         siswa,
@@ -522,16 +580,16 @@ export const db = {
     rekomRows
       .filter(h => h.ranking === 1)
       .forEach(h => {
-        const jur = allJurusan.find(j => j.id_jurusan === h.id_jurusan);
+        const jur = allJurusan.find(j => j.id === h.id_jurusan);
         if (jur) {
-          if (!countPerJurusan[jur.id_jurusan]) {
-            countPerJurusan[jur.id_jurusan] = {
+          if (!countPerJurusan[jur.id]) {
+            countPerJurusan[jur.id] = {
               count: 0,
               nama: jur.nama_jurusan,
               rumpun: jur.rumpun,
             };
           }
-          countPerJurusan[jur.id_jurusan].count++;
+          countPerJurusan[jur.id].count++;
         }
       });
 
