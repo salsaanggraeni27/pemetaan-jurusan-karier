@@ -1,4 +1,4 @@
-import { Jurusan, AturanBobot, NilaiSiswa, MataPelajaran } from './seed-data';
+import { Jurusan, AturanBobot, MataPelajaran } from '@/types';
 
 export interface JurusanScoreResult {
   jurusan: Jurusan;
@@ -33,20 +33,24 @@ export interface RecommendationEngineOutput {
  * Skor_jurusan(J) = sum(Nilai_mapel_i * Bobot_mapel_i,j) / sum(Bobot_mapel_i,j)
  */
 export function calculateJurusanRecommendations(
-  nilaiSiswaList: { id_mapel: number; nilai: number }[],
-  allJurusan: Jurusan[],
-  allAturanBobot: AturanBobot[],
-  allMapel: MataPelajaran[]
+  nilaiSiswaList: { id_mata_pelajaran?: number; id_mapel?: number; nilai: number }[],
+  allJurusan: (Jurusan | any)[],
+  allAturanBobot: (AturanBobot | any)[],
+  allMapel: (MataPelajaran | any)[]
 ): RecommendationEngineOutput {
   const mapelMap = new Map<number, MataPelajaran>();
-  allMapel.forEach(m => mapelMap.set(m.id_mapel, m));
+  allMapel.forEach(m => {
+    const id = Number(m.id ?? m.id_mapel);
+    mapelMap.set(id, { ...m, id, id_mapel: id });
+  });
 
   const nilaiMap = new Map<number, number>();
   let totalNilai = 0;
   nilaiSiswaList.forEach(n => {
+    const mapelId = Number(n.id_mata_pelajaran ?? n.id_mapel);
     // Pastikan nilai berada di range 0-100
     const normalized = Math.min(100, Math.max(0, Number(n.nilai) || 0));
-    nilaiMap.set(n.id_mapel, normalized);
+    nilaiMap.set(mapelId, normalized);
     totalNilai += normalized;
   });
 
@@ -56,8 +60,10 @@ export function calculateJurusanRecommendations(
     : 0;
 
   // Hitung skor untuk setiap jurusan berdasarkan aturan pembobotan
-  const scoredJurusan = allJurusan.map(jurusan => {
-    const rules = allAturanBobot.filter(r => r.id_jurusan === jurusan.id_jurusan);
+  const scoredJurusan = allJurusan.map(rawJurusan => {
+    const jurusanId = Number(rawJurusan.id ?? rawJurusan.id_jurusan);
+    const jurusan: Jurusan = { ...rawJurusan, id: jurusanId, id_jurusan: jurusanId };
+    const rules = allAturanBobot.filter(r => Number(r.id_jurusan) === jurusanId);
 
     let rawScore = 0;
     let totalWeight = 0;
@@ -65,17 +71,18 @@ export function calculateJurusanRecommendations(
 
     if (rules.length > 0) {
       rules.forEach(rule => {
-        const nilai = nilaiMap.get(rule.id_mapel) ?? 0;
-        const bobot = rule.bobot;
+        const ruleMapelId = Number(rule.id_mata_pelajaran ?? rule.id_mapel);
+        const nilai = nilaiMap.get(ruleMapelId) ?? 0;
+        const bobot = Number(rule.bobot);
         const kontribusi = (nilai * bobot) / 100;
 
         rawScore += (nilai * bobot);
         totalWeight += bobot;
 
-        const mapel = mapelMap.get(rule.id_mapel);
+        const mapel = mapelMap.get(ruleMapelId);
         breakdown.push({
-          mapelId: rule.id_mapel,
-          namaMapel: mapel ? mapel.nama_mapel : `Mapel #${rule.id_mapel}`,
+          mapelId: ruleMapelId,
+          namaMapel: mapel ? mapel.nama_mapel : `Mapel #${ruleMapelId}`,
           nilaiSiswa: nilai,
           bobot: bobot,
           kontribusiSkor: parseFloat(kontribusi.toFixed(2))
@@ -122,10 +129,13 @@ export function calculateJurusanRecommendations(
 
   // Analisis kekuatan akademik siswa
   const sortedNilai = [...nilaiSiswaList]
-    .map(n => ({
-      namaMapel: mapelMap.get(n.id_mapel)?.nama_mapel || `Mapel ${n.id_mapel}`,
-      nilai: n.nilai
-    }))
+    .map(n => {
+      const mapelId = Number(n.id_mata_pelajaran ?? n.id_mapel);
+      return {
+        namaMapel: mapelMap.get(mapelId)?.nama_mapel || `Mapel ${mapelId}`,
+        nilai: n.nilai
+      };
+    })
     .sort((a, b) => b.nilai - a.nilai);
 
   const terkuat = sortedNilai.slice(0, 3);

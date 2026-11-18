@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { Jurusan, MataPelajaran, AturanBobot } from '@/types';
 import { 
   Sliders, 
   Save, 
@@ -14,8 +15,8 @@ import {
 } from 'lucide-react';
 
 export default function MatriksBobotPage() {
-  const [jurusanList, setJurusanList] = useState<any[]>([]);
-  const [mapelList, setMapelList] = useState<any[]>([]);
+  const [jurusanList, setJurusanList] = useState<Jurusan[]>([]);
+  const [mapelList, setMapelList] = useState<MataPelajaran[]>([]);
   const [selectedJurusanId, setSelectedJurusanId] = useState<number>(1);
   const [currentRules, setCurrentRules] = useState<{ [mapelId: number]: number }>({});
   const [loading, setLoading] = useState(true);
@@ -30,7 +31,7 @@ export default function MatriksBobotPage() {
       if (jurRes.success) setJurusanList(jurRes.data);
       if (mapelRes.success) setMapelList(mapelRes.data);
       if (jurRes.data?.length > 0) {
-        setSelectedJurusanId(jurRes.data[0].id_jurusan);
+        setSelectedJurusanId(jurRes.data[0].id);
       }
       setLoading(false);
     }).catch(err => {
@@ -48,8 +49,8 @@ export default function MatriksBobotPage() {
       .then(res => {
         const rulesMap: { [mapelId: number]: number } = {};
         if (res.success && Array.isArray(res.data)) {
-          res.data.forEach((r: any) => {
-            rulesMap[r.id_mapel] = r.bobot;
+          res.data.forEach((r: AturanBobot) => {
+            rulesMap[r.id_mata_pelajaran] = r.bobot;
           });
         }
         setCurrentRules(rulesMap);
@@ -104,7 +105,7 @@ export default function MatriksBobotPage() {
     const rulesPayload = Object.entries(currentRules)
       .filter(([_, weight]) => Number(weight) > 0)
       .map(([mapelId, weight]) => ({
-        id_mapel: parseInt(mapelId),
+        id_mata_pelajaran: parseInt(mapelId),
         bobot: Number(weight)
       }));
 
@@ -131,7 +132,7 @@ export default function MatriksBobotPage() {
     }
   };
 
-  const selectedJurusan = jurusanList.find(j => j.id_jurusan === selectedJurusanId);
+  const selectedJurusan = jurusanList.find(j => j.id === selectedJurusanId);
 
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
@@ -190,11 +191,11 @@ export default function MatriksBobotPage() {
         <div className="flex flex-wrap gap-2">
           {jurusanList.map(j => (
             <button
-              key={j.id_jurusan}
+              key={j.id}
               type="button"
-              onClick={() => setSelectedJurusanId(j.id_jurusan)}
+              onClick={() => setSelectedJurusanId(j.id)}
               className={`px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${
-                selectedJurusanId === j.id_jurusan
+                selectedJurusanId === j.id
                   ? 'bg-indigo-600 text-white shadow-md shadow-indigo-500/20'
                   : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
               }`}
@@ -225,12 +226,12 @@ export default function MatriksBobotPage() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {mapelList.map(mapel => {
-            const currentVal = currentRules[mapel.id_mapel] || 0;
+            const currentVal = currentRules[mapel.id] || 0;
             const hasWeight = currentVal > 0;
 
             return (
               <div
-                key={mapel.id_mapel}
+                key={mapel.id}
                 className={`p-4 rounded-2xl border transition space-y-3 ${
                   hasWeight ? 'bg-white border-indigo-300 ring-1 ring-indigo-500/10 shadow-sm' : 'bg-slate-50 border-slate-200 opacity-80'
                 }`}
@@ -250,7 +251,7 @@ export default function MatriksBobotPage() {
                       min="0"
                       max="100"
                       value={currentVal}
-                      onChange={(e) => handleWeightChange(mapel.id_mapel, e.target.value)}
+                      onChange={(e) => handleWeightChange(mapel.id, e.target.value)}
                       className={`w-full text-center py-1 px-1.5 font-black rounded-lg text-sm border focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
                         hasWeight ? 'bg-indigo-50 text-indigo-700 border-indigo-200' : 'bg-white text-slate-400 border-slate-200'
                       }`}
@@ -265,7 +266,7 @@ export default function MatriksBobotPage() {
                     max="50"
                     step="5"
                     value={currentVal}
-                    onChange={(e) => handleWeightChange(mapel.id_mapel, e.target.value)}
+                    onChange={(e) => handleWeightChange(mapel.id, e.target.value)}
                     className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-600"
                   />
                   <div className="flex justify-between text-[10px] text-slate-400">

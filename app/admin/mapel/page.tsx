@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { MataPelajaran } from '@/types';
 import { 
   BookOpen, 
   Plus, 
@@ -12,11 +13,11 @@ import {
 } from 'lucide-react';
 
 export default function MasterMapelPage() {
-  const [mapelList, setMapelList] = useState<any[]>([]);
+  const [mapelList, setMapelList] = useState<MataPelajaran[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
-  const [editingMapel, setEditingMapel] = useState<any>(null);
+  const [editingMapel, setEditingMapel] = useState<MataPelajaran | null>(null);
   const [notification, setNotification] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
   const [formData, setFormData] = useState({
@@ -52,7 +53,7 @@ export default function MasterMapelPage() {
     setModalOpen(true);
   };
 
-  const handleOpenEdit = (item: any) => {
+  const handleOpenEdit = (item: MataPelajaran) => {
     setEditingMapel(item);
     setFormData({
       nama_mapel: item.nama_mapel,
@@ -68,7 +69,7 @@ export default function MasterMapelPage() {
 
     const payload: any = { ...formData };
     if (editingMapel) {
-      payload.id_mapel = editingMapel.id_mapel;
+      payload.id = editingMapel.id;
     }
 
     try {
@@ -177,8 +178,8 @@ export default function MasterMapelPage() {
             </thead>
             <tbody className="divide-y divide-slate-100">
               {filteredMapel.map(m => (
-                <tr key={m.id_mapel} className="hover:bg-slate-50 transition">
-                  <td className="py-3 px-4 font-mono text-slate-400">#{m.id_mapel}</td>
+                <tr key={m.id} className="hover:bg-slate-50 transition">
+                  <td className="py-3 px-4 font-mono text-slate-400">#{m.id}</td>
                   <td className="py-3 px-4 font-bold text-slate-900">{m.nama_mapel}</td>
                   <td className="py-3 px-4">
                     <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
@@ -200,7 +201,7 @@ export default function MasterMapelPage() {
                         <Edit className="w-4 h-4" />
                       </button>
                       <button
-                        onClick={() => handleDelete(m.id_mapel)}
+                        onClick={() => handleDelete(m.id)}
                         className="p-1.5 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 transition"
                       >
                         <Trash2 className="w-4 h-4" />

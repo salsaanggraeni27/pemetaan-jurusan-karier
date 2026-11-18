@@ -83,6 +83,14 @@ export default function Navbar() {
                   Beranda Siswa
                 </Link>
                 <Link
+                  href="/siswa/input-nilai"
+                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition ${
+                    pathname === '/siswa/input-nilai' ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                  }`}
+                >
+                  Transkrip Nilai
+                </Link>
+                <Link
                   href="/siswa/rekomendasi"
                   className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition ${
                     pathname === '/siswa/rekomendasi' ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
@@ -156,6 +164,14 @@ export default function Navbar() {
                   }`}
                 >
                   Master Karir
+                </Link>
+                <Link
+                  href="/admin/mapel"
+                  className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition ${
+                    pathname === '/admin/mapel' ? 'bg-indigo-50 text-indigo-700 font-bold' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                  }`}
+                >
+                  Master Mapel
                 </Link>
               </>
             ) : (
@@ -253,6 +269,13 @@ export default function Navbar() {
                   Beranda Siswa
                 </Link>
                 <Link
+                  href="/siswa/input-nilai"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="px-3 py-2 rounded-lg font-semibold text-slate-700 hover:bg-blue-50 hover:text-blue-700 bg-slate-50"
+                >
+                  Transkrip Nilai
+                </Link>
+                <Link
                   href="/siswa/rekomendasi"
                   onClick={() => setMobileMenuOpen(false)}
                   className="px-3 py-2 rounded-lg font-semibold text-slate-700 hover:bg-blue-50 hover:text-blue-700 bg-slate-50"
@@ -317,6 +340,13 @@ export default function Navbar() {
                   className="px-3 py-2 rounded-lg font-semibold text-slate-700 hover:bg-indigo-50 hover:text-indigo-700 bg-slate-50"
                 >
                   Master Karir
+                </Link>
+                <Link
+                  href="/admin/mapel"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="px-3 py-2 rounded-lg font-semibold text-slate-700 hover:bg-indigo-50 hover:text-indigo-700 bg-slate-50"
+                >
+                  Master Mapel
                 </Link>
               </>
             ) : null}
