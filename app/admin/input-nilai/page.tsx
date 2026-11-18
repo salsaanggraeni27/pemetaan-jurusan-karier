@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { 
   FileEdit, 
@@ -15,7 +15,7 @@ import {
   GraduationCap
 } from 'lucide-react';
 
-export default function AdminInputNilaiPage() {
+function AdminInputNilaiContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const preselectedSiswaId = searchParams.get('siswaId');
@@ -381,6 +381,14 @@ export default function AdminInputNilaiPage() {
       </form>
 
     </div>
+  );
+}
+
+export default function AdminInputNilaiPage() {
+  return (
+    <Suspense fallback={<div className="max-w-6xl mx-auto px-4 py-16 text-center text-slate-500">Memuat halaman input nilai...</div>}>
+      <AdminInputNilaiContent />
+    </Suspense>
   );
 }
 

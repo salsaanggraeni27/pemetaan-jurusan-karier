@@ -11,7 +11,7 @@ export async function GET(request: Request) {
       return NextResponse.json({ success: false, message: 'siswaId dibutuhkan' }, { status: 400 });
     }
 
-    const nilaiList = db.getNilaiSiswa(parseInt(siswaId));
+    const nilaiList = await db.getNilaiSiswa(parseInt(siswaId));
     return NextResponse.json({ success: true, data: nilaiList });
   } catch (error: any) {
     return NextResponse.json({ success: false, message: error.message }, { status: 500 });
@@ -27,12 +27,14 @@ export async function POST(request: Request) {
     }
 
     // Eksekusi simpan nilai dan kalkulasi Rule-Based Matching Engine
-    const calculation = db.saveNilaiSiswaAndCalculate(parseInt(siswaId), nilaiList);
+    const calculation = await db.saveNilaiSiswaAndCalculate(parseInt(siswaId), nilaiList);
 
     // Dapatkan karir terkait untuk 3 rekomendasi teratas
-    const allJurusan = db.getJurusan();
-    const allKarir = db.getKarir();
-    const allRelasi = db.getRelasiJurusanKarir();
+    const [allJurusan, allKarir, allRelasi] = await Promise.all([
+      db.getJurusan(),
+      db.getKarir(),
+      db.getRelasiJurusanKarir()
+    ]);
 
     const topResultsWithCareers = calculation.results.map(r => {
       const linkedCareer = getLinkedCareersForJurusan(r.jurusan.id_jurusan, allJurusan, allKarir, allRelasi);

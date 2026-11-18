@@ -7,11 +7,11 @@ export async function GET(request: Request) {
     const jurusanId = searchParams.get('jurusanId');
 
     if (jurusanId) {
-      const rules = db.getAturanBobotByJurusan(parseInt(jurusanId));
+      const rules = await db.getAturanBobotByJurusan(parseInt(jurusanId));
       return NextResponse.json({ success: true, data: rules });
     }
 
-    const allRules = db.getAturanBobot();
+    const allRules = await db.getAturanBobot();
     return NextResponse.json({ success: true, data: allRules });
   } catch (error: any) {
     return NextResponse.json({ success: false, message: error.message }, { status: 500 });
@@ -26,7 +26,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, message: 'Jurusan ID dan daftar rules wajib diisi' }, { status: 400 });
     }
 
-    const updated = db.updateAturanBobotForJurusan(parseInt(jurusanId), rules);
+    const updated = await db.updateAturanBobotForJurusan(parseInt(jurusanId), rules);
     return NextResponse.json({
       success: true,
       message: 'Matriks pembobotan berhasil diperbarui',

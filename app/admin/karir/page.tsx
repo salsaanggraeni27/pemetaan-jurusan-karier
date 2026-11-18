@@ -15,10 +15,13 @@ import {
 
 export default function MasterKarirPage() {
   const [karirList, setKarirList] = useState<any[]>([]);
+  const [jurusanList, setJurusanList] = useState<any[]>([]);
+  const [relasiList, setRelasiList] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
   const [editingKarir, setEditingKarir] = useState<any>(null);
+  const [selectedJurusanIds, setSelectedJurusanIds] = useState<number[]>([]);
   const [notification, setNotification] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
   const [formData, setFormData] = useState({
@@ -31,10 +34,18 @@ export default function MasterKarirPage() {
   });
 
   const fetchKarir = () => {
-    fetch('/api/karir')
-      .then(res => res.json())
-      .then(res => {
-        if (res.success) setKarirList(res.data || []);
+    Promise.all([
+      fetch('/api/karir').then(res => res.json()),
+      fetch('/api/jurusan').then(res => res.json())
+    ])
+      .then(([karirRes, jurRes]) => {
+        if (karirRes.success) {
+          setKarirList(karirRes.data || []);
+          setRelasiList(karirRes.relasi || []);
+        }
+        if (jurRes.success) {
+          setJurusanList(jurRes.data || []);
+        }
         setLoading(false);
       })
       .catch(err => {
@@ -47,8 +58,15 @@ export default function MasterKarirPage() {
     fetchKarir();
   }, []);
 
+  const toggleJurusanSelection = (jurusanId: number) => {
+    setSelectedJurusanIds(prev =>
+      prev.includes(jurusanId) ? prev.filter(id => id !== jurusanId) : [...prev, jurusanId]
+    );
+  };
+
   const handleOpenAdd = () => {
     setEditingKarir(null);
+    setSelectedJurusanIds([]);
     setFormData({
       profesi: '',
       industri: 'Teknologi Informasi',
@@ -62,6 +80,10 @@ export default function MasterKarirPage() {
 
   const handleOpenEdit = (item: any) => {
     setEditingKarir(item);
+    const linkedIds = relasiList
+      .filter(r => r.id_karir === item.id_karir)
+      .map(r => r.id_jurusan);
+    setSelectedJurusanIds(linkedIds);
     setFormData({
       profesi: item.profesi,
       industri: item.industri,
@@ -81,7 +103,8 @@ export default function MasterKarirPage() {
 
     const payload: any = {
       ...formData,
-      kualifikasi_utama: formData.kualifikasi_utama.split(',').map(s => s.trim())
+      kualifikasi_utama: formData.kualifikasi_utama.split(',').map(s => s.trim()),
+      jurusanIds: selectedJurusanIds
     };
 
     if (editingKarir) {
@@ -220,9 +243,15 @@ export default function MasterKarirPage() {
               </div>
             </div>
 
-            <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[11px]">
-              <span className="text-slate-500">Prospek: <strong>{k.prospek_masa_depan}</strong></span>
-              <span className="text-sky-700 font-bold">Terhubung ke Program Studi</span>
+            <div className="pt-2 border-t border-slate-100 flex items-center justify-between gap-2 text-[11px]">
+              <span className="text-slate-500 shrink-0">Prospek: <strong>{k.prospek_masa_depan}</strong></span>
+              <span className="text-sky-700 font-bold truncate">
+                {relasiList
+                  .filter(r => r.id_karir === k.id_karir)
+                  .map(r => jurusanList.find(j => j.id_jurusan === r.id_jurusan)?.nama_jurusan)
+                  .filter(Boolean)
+                  .join(', ') || 'Belum terhubung ke Jurusan'}
+              </span>
             </div>
           </div>
         ))}
@@ -319,6 +348,32 @@ export default function MasterKarirPage() {
                   placeholder="Uraian tanggung jawab harian profesi..."
                   className="w-full p-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-sky-500 text-slate-900"
                 />
+              </div>
+
+              <div>
+                <label className="block font-bold text-slate-700 mb-1">
+                  Program Studi Terkait ({selectedJurusanIds.length} dipilih)
+                </label>
+                <div className="max-h-40 overflow-y-auto border border-slate-200 rounded-xl p-2.5 space-y-1.5 bg-slate-50">
+                  {jurusanList.map(j => (
+                    <label
+                      key={j.id_jurusan}
+                      className="flex items-center gap-2 p-1.5 rounded-lg hover:bg-white cursor-pointer text-slate-700"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={selectedJurusanIds.includes(j.id_jurusan)}
+                        onChange={() => toggleJurusanSelection(j.id_jurusan)}
+                        className="rounded border-slate-300 text-sky-600 focus:ring-sky-500"
+                      />
+                      <span className="font-medium">{j.nama_jurusan}</span>
+                      <span className="text-[10px] text-slate-400 ml-auto">{j.rumpun}</span>
+                    </label>
+                  ))}
+                  {jurusanList.length === 0 && (
+                    <p className="text-slate-400 italic p-1">Belum ada data jurusan.</p>
+                  )}
+                </div>
               </div>
 
               <div className="pt-2 flex justify-end gap-2">

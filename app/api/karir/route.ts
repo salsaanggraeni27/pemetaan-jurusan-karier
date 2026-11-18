@@ -1,10 +1,14 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
   try {
-    const list = db.getKarir();
-    const relasi = db.getRelasiJurusanKarir();
+    const [list, relasi] = await Promise.all([
+      db.getKarir(),
+      db.getRelasiJurusanKarir()
+    ]);
     return NextResponse.json({ success: true, data: list, relasi });
   } catch (error: any) {
     return NextResponse.json({ success: false, message: error.message }, { status: 500 });
@@ -18,7 +22,11 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, message: 'Profesi dan industri wajib diisi' }, { status: 400 });
     }
 
-    const saved = db.saveKarir(body);
+    const { jurusanIds, ...karirPayload } = body;
+    const saved = await db.saveKarir(karirPayload);
+    if (Array.isArray(jurusanIds)) {
+      await db.setRelasiForKarir(saved.id_karir, jurusanIds);
+    }
     return NextResponse.json({ success: true, data: saved, message: 'Data karir berhasil disimpan' });
   } catch (error: any) {
     return NextResponse.json({ success: false, message: error.message }, { status: 500 });
@@ -33,7 +41,7 @@ export async function DELETE(request: Request) {
       return NextResponse.json({ success: false, message: 'ID karir dibutuhkan' }, { status: 400 });
     }
 
-    db.deleteKarir(parseInt(id));
+    await db.deleteKarir(parseInt(id));
     return NextResponse.json({ success: true, message: 'Data karir berhasil dihapus' });
   } catch (error: any) {
     return NextResponse.json({ success: false, message: error.message }, { status: 500 });
