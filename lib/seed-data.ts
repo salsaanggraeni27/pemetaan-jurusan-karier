@@ -53,6 +53,7 @@ export interface NilaiSiswa {
   id_nilai: number;
   id_siswa: number;
   id_mapel: number;
+  semester?: number; // 1 s/d 6
   nilai: number;
 }
 

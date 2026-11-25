@@ -112,6 +112,24 @@ function persistData() {
   }
 }
 
+function aggregateStudentGradesByMapel(records: NilaiSiswa[]): { id_mapel: number; nilai: number }[] {
+  const byMapel = new Map<number, number[]>();
+  records.forEach((n) => {
+    const val = Number(n.nilai) || 0;
+    if (val > 0) {
+      const list = byMapel.get(n.id_mapel) || [];
+      list.push(val);
+      byMapel.set(n.id_mapel, list);
+    }
+  });
+  const result: { id_mapel: number; nilai: number }[] = [];
+  byMapel.forEach((vals, id_mapel) => {
+    const avg = parseFloat((vals.reduce((a, b) => a + b, 0) / vals.length).toFixed(1));
+    result.push({ id_mapel, nilai: avg });
+  });
+  return result;
+}
+
 export const db = {
   // USERS
   getUsers: () => ensureDataFile().users,
@@ -239,29 +257,91 @@ export const db = {
   },
 
   // NILAI SISWA & REKOMENDASI
-  getNilaiSiswa: (siswaId: number) => {
+  getNilaiSiswa: (siswaId: number, semester?: number) => {
     const data = ensureDataFile();
-    return data.nilai_siswa.filter(n => n.id_siswa === siswaId);
+    const list = data.nilai_siswa.filter(n => n.id_siswa === siswaId);
+    if (semester !== undefined && semester !== null) {
+      return list.filter(n => (n.semester ?? 1) === semester);
+    }
+    return list;
   },
-  saveNilaiSiswaAndCalculate: (siswaId: number, inputNilai: { id_mapel: number; nilai: number }[]) => {
+  deleteNilaiSiswa: (siswaId: number, semester?: number, mapelId?: number) => {
     const data = ensureDataFile();
-    
-    // Hapus nilai lama siswa ini
-    data.nilai_siswa = data.nilai_siswa.filter(n => n.id_siswa !== siswaId);
-    let nextId = (data.nilai_siswa.length > 0 ? Math.max(...data.nilai_siswa.map(n => n.id_nilai)) : 0) + 1;
-    
-    inputNilai.forEach(item => {
-      data.nilai_siswa.push({
-        id_nilai: nextId++,
-        id_siswa: siswaId,
-        id_mapel: item.id_mapel,
-        nilai: Math.min(100, Math.max(0, Number(item.nilai) || 0))
-      });
+    data.nilai_siswa = data.nilai_siswa.filter(n => {
+      if (n.id_siswa !== siswaId) return true;
+      if (semester !== undefined && (n.semester ?? 1) !== semester) return true;
+      if (mapelId !== undefined && n.id_mapel !== mapelId) return true;
+      return false;
     });
+
+    const remainingRecords = data.nilai_siswa.filter(n => n.id_siswa === siswaId);
+    const aggregated = aggregateStudentGradesByMapel(remainingRecords);
+    data.hasil_rekomendasi = data.hasil_rekomendasi.filter(h => h.id_siswa !== siswaId);
+
+    if (aggregated.length > 0) {
+      const calculation = calculateJurusanRecommendations(
+        aggregated,
+        data.jurusan,
+        data.aturan_bobot,
+        data.mata_pelajaran
+      );
+      let nextRecId = (data.hasil_rekomendasi.length > 0 ? Math.max(...data.hasil_rekomendasi.map(h => h.id)) : 0) + 1;
+      calculation.results.forEach(res => {
+        data.hasil_rekomendasi.push({
+          id: nextRecId++,
+          id_siswa: siswaId,
+          id_jurusan: res.jurusan.id_jurusan,
+          total_skor: res.rawScore,
+          persentase_kecocokan: res.normalizedScore,
+          ranking: res.ranking,
+          tanggal_analisis: new Date().toISOString()
+        });
+      });
+    }
+    persistData();
+    return true;
+  },
+  saveNilaiSiswaAndCalculate: (
+    siswaId: number,
+    inputNilai: { id_mapel: number; nilai: number; semester?: number }[],
+    semesterScope?: number
+  ) => {
+    const data = ensureDataFile();
+
+    // Hapus nilai lama siswa sesuai cakupan semester (atau seluruhnya jika semesterScope tidak diset & item tidak punya semester)
+    if (semesterScope !== undefined && semesterScope !== null) {
+      data.nilai_siswa = data.nilai_siswa.filter(
+        n => !(n.id_siswa === siswaId && (n.semester ?? 1) === semesterScope)
+      );
+    } else {
+      const incomingSemesters = new Set(inputNilai.map(i => i.semester ?? 1));
+      data.nilai_siswa = data.nilai_siswa.filter(
+        n => !(n.id_siswa === siswaId && incomingSemesters.has(n.semester ?? 1))
+      );
+    }
+
+    let nextId = (data.nilai_siswa.length > 0 ? Math.max(...data.nilai_siswa.map(n => n.id_nilai)) : 0) + 1;
+
+    inputNilai.forEach(item => {
+      const val = Math.min(100, Math.max(0, Number(item.nilai) || 0));
+      if (val > 0) {
+        data.nilai_siswa.push({
+          id_nilai: nextId++,
+          id_siswa: siswaId,
+          id_mapel: item.id_mapel,
+          semester: item.semester ?? semesterScope ?? 1,
+          nilai: val
+        });
+      }
+    });
+
+    // Hitung rata-rata lintas semester untuk setiap mata pelajaran siswa ini
+    const allStudentRecords = data.nilai_siswa.filter(n => n.id_siswa === siswaId);
+    const aggregatedInput = aggregateStudentGradesByMapel(allStudentRecords);
 
     // Jalankan Rule-Based Matching Engine
     const calculation = calculateJurusanRecommendations(
-      inputNilai,
+      aggregatedInput,
       data.jurusan,
       data.aturan_bobot,
       data.mata_pelajaran
@@ -270,7 +350,7 @@ export const db = {
     // Simpan hasil rekomendasi ke database
     data.hasil_rekomendasi = data.hasil_rekomendasi.filter(h => h.id_siswa !== siswaId);
     let nextRecId = (data.hasil_rekomendasi.length > 0 ? Math.max(...data.hasil_rekomendasi.map(h => h.id)) : 0) + 1;
-    
+
     calculation.results.forEach(res => {
       data.hasil_rekomendasi.push({
         id: nextRecId++,
@@ -289,11 +369,12 @@ export const db = {
   getHasilRekomendasiSiswa: (siswaId: number) => {
     const data = ensureDataFile();
     const siswaNilai = data.nilai_siswa.filter(n => n.id_siswa === siswaId);
-    if (siswaNilai.length === 0) {
+    const aggregated = aggregateStudentGradesByMapel(siswaNilai);
+    if (aggregated.length === 0) {
       return null;
     }
     return calculateJurusanRecommendations(
-      siswaNilai.map(n => ({ id_mapel: n.id_mapel, nilai: n.nilai })),
+      aggregated,
       data.jurusan,
       data.aturan_bobot,
       data.mata_pelajaran
@@ -304,23 +385,37 @@ export const db = {
   getMonitoringSummary: () => {
     const data = ensureDataFile();
     const siswaUsers = data.users.filter(u => u.role === 'SISWA');
-    
+
     const siswaStatusList = siswaUsers.map(siswa => {
-      const nilai = data.nilai_siswa.filter(n => n.id_siswa === siswa.id);
-      const isCompleted = nilai.length >= 8; // minimal 8 mapel
+      const nilaiRecords = data.nilai_siswa.filter(n => n.id_siswa === siswa.id);
+      const aggregated = aggregateStudentGradesByMapel(nilaiRecords);
+      const semestersFilled = Array.from(new Set(nilaiRecords.map(n => n.semester ?? 1))).sort();
+      const rataRata = aggregated.length > 0
+        ? parseFloat((aggregated.reduce((a, b) => a + b.nilai, 0) / aggregated.length).toFixed(1))
+        : 0;
+      const isCompleted = aggregated.length >= 5;
       const recs = data.hasil_rekomendasi.filter(h => h.id_siswa === siswa.id).sort((a, b) => a.ranking - b.ranking);
-      
+
       const topMajorId = recs[0]?.id_jurusan;
       const topMajor = data.jurusan.find(j => j.id_jurusan === topMajorId);
 
+      // Cari prospek karir terkait untuk topMajor
+      const relasi = topMajorId ? data.relasi_jurusan_karir.filter(r => r.id_jurusan === topMajorId) : [];
+      const karirNames = relasi
+        .map(r => data.karir.find(k => k.id_karir === r.id_karir)?.profesi)
+        .filter(Boolean) as string[];
+
       return {
         siswa,
-        totalMapelDiisi: nilai.length,
+        totalMapelDiisi: aggregated.length,
+        semestersFilled,
+        rataRata,
         status: isCompleted ? 'Selesai Pemetaan' : 'Belum Lengkap',
         topRekomendasi: topMajor ? {
           nama: topMajor.nama_jurusan,
           rumpun: topMajor.rumpun,
-          skor: recs[0]?.persentase_kecocokan || 0
+          skor: recs[0]?.persentase_kecocokan || 0,
+          karir: karirNames
         } : null,
         tanggal: recs[0]?.tanggal_analisis || null
       };

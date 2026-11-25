@@ -5,7 +5,8 @@ import Footer from '@/components/Footer';
 
 export const metadata: Metadata = {
   title: 'Pemetaan Jurusan & Karir | SMAN 1 Bandung',
-  description: 'Aplikasi Web Mapping Jurusan Pendidikan Tinggi dan Prospek Karir Berbasis Nilai Akademik di SMAN 1 Bandung menggunakan Algoritma Rule-Based Matching',
+  description:
+    'Sistem Pemetaan Jurusan Pendidikan Tinggi dan Prospek Karir Berbasis Nilai Akademik Rapor di SMAN 1 Bandung.',
 };
 
 export default function RootLayout({
@@ -15,7 +16,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="id">
-      <body className="flex flex-col min-h-screen bg-slate-50 text-slate-900 font-sans antialiased">
+      <body className="flex flex-col min-h-svh bg-[#f7f7f5] text-[#111211] antialiased selection:bg-[#e4572e] selection:text-white">
         <Navbar />
         <main className="flex-1">
           {children}
@@ -25,4 +26,3 @@ export default function RootLayout({
     </html>
   );
 }
-

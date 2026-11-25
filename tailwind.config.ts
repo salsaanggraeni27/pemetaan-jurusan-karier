@@ -8,19 +8,28 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ["'Fira Sans'", "system-ui", "-apple-system", "sans-serif"],
+        heading: ["'Fira Sans'", "system-ui", "-apple-system", "sans-serif"],
+        mono: ["'Fira Code'", "monospace"],
+      },
       colors: {
-        sman1: {
-          50: '#f0f7ff',
-          100: '#e0effe',
-          200: '#bae0fd',
-          300: '#7cc8fb',
-          400: '#36abf6',
-          500: '#0c8ee7',
-          600: '#0171c6',
-          700: '#025aa0',
-          800: '#064d84',
-          900: '#0a406e',
-          950: '#072949',
+        ink: {
+          DEFAULT: "#141619",
+          body: "#25282D",
+          muted: "#525863",
+          faint: "#E2E2DC",
+        },
+        ground: {
+          main: "#F4F4F1",
+          alt: "#EAEAE5",
+          card: "#FFFFFF",
+          dark: "#121417",
+        },
+        action: {
+          DEFAULT: "#0B5D51",
+          hover: "#08473E",
+          tint: "#E6F0EE",
         },
       },
     },
@@ -28,4 +37,3 @@ const config: Config = {
   plugins: [],
 };
 export default config;
-

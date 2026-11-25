@@ -17,7 +17,11 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, message: 'Nama jurusan dan rumpun wajib diisi' }, { status: 400 });
     }
 
-    const saved = db.saveJurusan(body);
+    const { karirIds, ...jurusanPayload } = body;
+    const saved = db.saveJurusan(jurusanPayload);
+    if (Array.isArray(karirIds)) {
+      db.setRelasiForJurusan(saved.id_jurusan, karirIds.map(Number));
+    }
     return NextResponse.json({ success: true, data: saved, message: 'Data jurusan berhasil disimpan' });
   } catch (error: any) {
     return NextResponse.json({ success: false, message: error.message }, { status: 500 });
